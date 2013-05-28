@@ -16,7 +16,8 @@ Ext.define("Keep.controller.Keeps", {
             noteEditor: {
                 // The commands fired by the note editor.
                 saveNoteCommand: "onSaveNoteCommand",
-                backButtonCommand: "onBackButtonCommand"
+                backButtonCommand: "onBackButtonCommand",
+                deleteButtonCommand: "onDeleteButtonCommand"
             }
         }
     },
@@ -39,6 +40,18 @@ Ext.define("Keep.controller.Keeps", {
         console.log("onEditNoteCommand");
         this.activateNoteEditor(record);
     },
+    onDeleteButtonCommand: function () {
+    	console.log("onDeleteNoteCommand");
+
+        var noteEditor = this.getNoteEditor();
+        var currentNote = noteEditor.getRecord();
+        var notesStore = Ext.getStore("Notes");
+
+        notesStore.remove(currentNote);
+        notesStore.sync();
+
+        this.activateNotesList();
+    },
     // Base Class functions.
     launch: function () {
         this.callParent(arguments);
@@ -58,11 +71,9 @@ Ext.define("Keep.controller.Keeps", {
         Ext.Viewport.animateActiveItem(noteEditor, this.slideLeftTransition);
     },
     onSaveNoteCommand: function () {
-
         console.log("onSaveNoteCommand");
 
         var noteEditor = this.getNoteEditor();
-
         var currentNote = noteEditor.getRecord();
         var newValues = noteEditor.getValues();
 
@@ -71,7 +82,6 @@ Ext.define("Keep.controller.Keeps", {
         currentNote.set("narrative", newValues.narrative);
 
         var errors = currentNote.validate();
-
         if (!errors.isValid()) {
             Ext.Msg.alert('Wait!', errors.getByField("title")[0].getMessage(), Ext.emptyFn);
             currentNote.reject();
@@ -79,15 +89,11 @@ Ext.define("Keep.controller.Keeps", {
         }
 
         var notesStore = Ext.getStore("Notes");
-
         if (null == notesStore.findRecord('id', currentNote.data.id)) {
             notesStore.add(currentNote);
         }
-
         notesStore.sync();
-
         notesStore.sort([{ property: 'dateCreated', direction: 'DESC'}]);
-
         this.activateNotesList();
     },
     activateNotesList: function () {

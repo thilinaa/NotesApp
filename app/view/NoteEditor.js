@@ -40,6 +40,7 @@ Ext.define("Keep.view.NoteEditor", {
             xtype: "button",
             iconCls: "trash",
             iconMask: true,
+            handler: this.onDeleteButtonTap,
             scope: this
         };
 
@@ -79,7 +80,9 @@ Ext.define("Keep.view.NoteEditor", {
     onBackButtonTap: function () {
     	console.log("backButtonCommand");
     	this.fireEvent("backButtonCommand", this);
+    },
+    onDeleteButtonTap: function () {
+    	console.log("deleteButtonCommand");
+    	this.fireEvent("deleteButtonCommand");
     }
-
-
 });
